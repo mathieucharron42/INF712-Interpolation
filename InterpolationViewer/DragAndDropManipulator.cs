@@ -38,13 +38,13 @@ namespace InterpolationViewer
 
             if (_model.ControlSeries == currentSeries)
             {
-                _model.PointsSetType = PointsSet.Type.Custom;
                 _model.Points = currentSeries.Points.ConvertAll(p => new Vector2D(p.X, p.Y));
+                _model.PointsSetType = PointsSet.Type.Custom;
             }
             else if(_model.AdditionalControlSeries == currentSeries)
             {
-                _model.ControlPointConstraint = Interpolations.ControlPointContrainst.Custom;
                 _model.AdditionalControlPoints = currentSeries.Points.ConvertAll(p => new Vector2D(p.X, p.Y));
+                _model.ControlPointConstraint = Interpolations.ControlPointContrainst.Custom;
             }
             else
             {
