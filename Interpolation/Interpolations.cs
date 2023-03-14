@@ -38,35 +38,35 @@ namespace Interpolation
 
         public static List<ControlPointContrainst> GetPossibleConstrainsts(InterpolationMode mode)
         {
-            List<ControlPointContrainst> Contraints = new List<ControlPointContrainst>();
+            List<ControlPointContrainst> constraints = new List<ControlPointContrainst>();
 
             if (mode == InterpolationMode.Linear)
             {
-                Contraints.Add(ControlPointContrainst.C0);
+                constraints.Add(ControlPointContrainst.C0);
             }
             else if (mode == InterpolationMode.CalmullRom)
             {
-                Contraints.Add(ControlPointContrainst.C0);
-                Contraints.Add(ControlPointContrainst.C1);
+                constraints.Add(ControlPointContrainst.C0);
+                constraints.Add(ControlPointContrainst.C1);
             }
             else if (mode == InterpolationMode.BezierLineaire)
             {
-                Contraints.Add(ControlPointContrainst.C0);
+                constraints.Add(ControlPointContrainst.C0);
             }
             else if (mode == InterpolationMode.BezierQuadratique)
             {
-                Contraints.Add(ControlPointContrainst.C0);
-                Contraints.Add(ControlPointContrainst.C1);
+                constraints.Add(ControlPointContrainst.C0);
+                constraints.Add(ControlPointContrainst.C1);
             }
             else if (mode == InterpolationMode.BezierCubique)
             {
-                Contraints.Add(ControlPointContrainst.C0);
-                Contraints.Add(ControlPointContrainst.C1);
+                constraints.Add(ControlPointContrainst.C0);
+                constraints.Add(ControlPointContrainst.C1);
                 // Bugged :(
-                 Contraints.Add(ControlPointContrainst.C2_Buggé);
+                 constraints.Add(ControlPointContrainst.C2_Buggé);
             }
-
-            return Contraints;
+            constraints.Add(Interpolations.ControlPointContrainst.Custom);
+            return constraints;
         }
 
         public static Vector2D Linear(List<Vector2D> points, List<Vector2D> controlPoints, double x)

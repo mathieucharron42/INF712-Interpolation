@@ -26,13 +26,13 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row="0" Text="Ensemble de point" VerticalAlignment="Center" Margin="5,5,10,5" />
-        <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Path=PointsSetTypes}" SelectedValue="{Binding Path=PointsSetType}" Margin="7" />
+        <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Path=PointsSetTypes}" SelectedItem="{Binding Path=PointsSetType}" Margin="7" />
 
         <TextBlock Grid.Column="0" Grid.Row="1" Text="Type" VerticalAlignment="Center"  Margin="5,5,10,5"/>
-        <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Path=InterpolationModes}" SelectedValue="{Binding Path=InterpolationMode}" Margin="7" />
+        <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Path=InterpolationModes}" SelectedItem="{Binding Path=InterpolationMode}" Margin="7" />
 
         <TextBlock Grid.Column="0" Grid.Row="2" Text="Contraintes" VerticalAlignment="Center"  Margin="5,5,10,5"/>
-        <ComboBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Path=ControlPointContraints}" SelectedValue="{Binding Path=ControlPointConstraint}" Margin="7" />
+        <ComboBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Path=ControlPointConstraints}" SelectedItem="{Binding Path=ControlPointConstraint}" Margin="7" />
 
         <TextBlock Grid.Column="0" Grid.Row="3" Text="Taux" VerticalAlignment="Center"  Margin="5,5,10,5"/>
         <StackPanel Grid.Column="1" Grid.Row="3" Orientation="Horizontal" Margin="7">
@@ -42,8 +42,6 @@
 
         <TextBlock Grid.Column="0" Grid.Row="4" Text="Zoom" VerticalAlignment="Center"  Margin="5,5,10,5"/>
         <ComboBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding Path=PlotScaleTypes}" SelectedValue="{Binding Path=PlotScale}" Margin="7" />
-
-        <!--<oxy:PlotView Grid.Column="1" Grid.Row="5" Model="{Binding Plot}" Width="700" Height="350" Margin="7"  />-->
 
         <oxy:PlotView Grid.Column="1" Grid.Row="5" Model="{Binding Plot}" Width="700" Height="350" Margin="7" Controller="{Binding Controller}" />
     </Grid>

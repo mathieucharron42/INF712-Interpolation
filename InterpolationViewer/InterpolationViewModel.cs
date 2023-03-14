@@ -4,6 +4,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -34,7 +35,6 @@ namespace InterpolationViewer
             InterpolationRate = 0.01f;
             InterpolationMode = Interpolations.InterpolationMode.Linear;
             PointsSetType = PointsSet.Type.Simple;
-            ControlPointConstraint = ControlPointContraints.Last();
             PlotScale = PlotScaleType.OriginalPoints;
         }
 
@@ -50,7 +50,7 @@ namespace InterpolationViewer
                 if (_pointsSetType != PointsSet.Type.Custom)
                 {
                     Points = null;
-                    ControlPointConstraint = null;
+                    ControlPointConstraint = BestControlPointConstraints;
                 }
                 NotifyPropertyChanged("PointsSetType");
                 NotifyPropertyChanged("Plot");
@@ -87,33 +87,27 @@ namespace InterpolationViewer
             set
             {
                 _interpolationMode = value;
-                ControlPointConstraint = null;
+                ControlPointConstraint = BestControlPointConstraints;
                 NotifyPropertyChanged("InterpolationMode");
-                NotifyPropertyChanged("ControlPointContraints");
+                NotifyPropertyChanged("ControlPointConstraint");
+                NotifyPropertyChanged("ControlPointConstraints");
                 NotifyPropertyChanged("Plot");
             }
         }
-
-        public Interpolations.ControlPointContrainst? ControlPointConstraint
+        
+        public Interpolations.ControlPointContrainst ControlPointConstraint
         {
             get
             {
-                if (_controlPointConstraint.HasValue)
-                {
-                    return _controlPointConstraint.Value;
-                }
-                else
-                {
-                    return ControlPointContraints.Last(cc => cc != Interpolations.ControlPointContrainst.C2_Buggé);
-                }
+                return _controlPointConstraint;
             }
             set
             {
                 _controlPointConstraint = value;
-                if(_controlPointConstraint != Interpolations.ControlPointContrainst.Custom)
+                if (_controlPointConstraint != Interpolations.ControlPointContrainst.Custom)
                 {
                     AdditionalControlPoints = null;
-                }               
+                }
                 NotifyPropertyChanged("ControlPointConstraint");
                 NotifyPropertyChanged("Plot");
             }
@@ -123,13 +117,13 @@ namespace InterpolationViewer
         {
             get
             {
-                if (_additionalControlPoints == null)
+                if (_additionalControlPoints != null)
                 {
-                    return Interpolations.GetControlPoints(Points, InterpolationMode, ControlPointConstraint.Value);
+                    return _additionalControlPoints;
                 }
                 else
                 {
-                    return _additionalControlPoints;
+                    return Interpolations.GetControlPoints(Points, InterpolationMode, ControlPointConstraint);
                 }
             }
             set
@@ -198,10 +192,6 @@ namespace InterpolationViewer
                 InterpolationFunc interpolationFunction = kInterpolationModeMapping[InterpolationMode];
 
                 List<Vector2D> interpolatedPoints = Interpolations.Chain(interpolationFunction, points, controlPoints, inputMin, inputMax, InterpolationRate);
-                foreach(Vector2D p in interpolatedPoints)
-                {
-                    Console.WriteLine(p);
-                }
 
                 PlotModel model = new PlotModel { Title = string.Format("Interpolation {0} {1}", InterpolationMode, ControlPointConstraint) };
                 ScatterSeries interpolatedSeries = new ScatterSeries();
@@ -298,18 +288,24 @@ namespace InterpolationViewer
             get
             {
                 List<PointsSet.Type> list = Enum.GetValues(typeof(PointsSet.Type)).Cast<PointsSet.Type>().ToList();
-                list.Remove(PointsSet.Type.Custom);
                 return list;
             }
         }
 
-        public List<Interpolations.ControlPointContrainst> ControlPointContraints
+        public List<Interpolations.ControlPointContrainst> ControlPointConstraints
         {
             get
             {
                 List<Interpolations.ControlPointContrainst> list = Interpolations.GetPossibleConstrainsts(InterpolationMode);
-                list.Remove(Interpolations.ControlPointContrainst.Custom); 
                 return list;
+            }
+        }
+
+        public Interpolations.ControlPointContrainst BestControlPointConstraints
+        {
+            get
+            {
+                return ControlPointConstraints.Last(cc => cc != Interpolations.ControlPointContrainst.C2_Buggé && cc != Interpolations.ControlPointContrainst.Custom);
             }
         }
 
@@ -333,7 +329,7 @@ namespace InterpolationViewer
         private PointsSet.Type _pointsSetType;
         private List<Vector2D> _points;
         private Interpolations.InterpolationMode _interpolationMode;
-        private Interpolations.ControlPointContrainst? _controlPointConstraint;
+        private Interpolations.ControlPointContrainst _controlPointConstraint;
         private List<Vector2D> _additionalControlPoints;
         private float _interpolationRate;
         private PlotScaleType _plotScale;
