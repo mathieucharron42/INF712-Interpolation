@@ -8,22 +8,22 @@ namespace Interpolation
     {
         static void Main(string[] args)
         {
-            //const float interpolationRate = 0.01f;
+            const float interpolationRate = 1.0f;
 
-            //List<Vector2D> points = PointsSet.GetSet(PointsSet.Type.CornerCase);
+            List<Vector2D> points = PointsSet.GetSet(PointsSet.Type.Simple);
 
-            //double min = points.First().X;
-            //double max = points.Last().X;
+            double min = points.First().X;
+            double max = points.Last().X;
 
-            //List<Vector2D> controlPoints = InterpolationHelper.GetControlPoints(points, Interpolations.InterpolationMode.CalmullRom);
+            List<Vector2D> controlPoints = Interpolations.GetControlPoints(points, Interpolations.InterpolationMode.CalmullRom, Interpolations.ControlPointContrainst.C0);
 
-            //List<Vector2D> interpolatedPoints = InterpolationHelper.Chain(Interpolations.CatmulRom, controlPoints, min, max, interpolationRate);
+            List<Vector2D> interpolatedPoints = Interpolations.Chain(Interpolations.CatmulRom, points, controlPoints, min, max, interpolationRate);
 
-            //foreach (Vector2D interpolatedPoint in interpolatedPoints)
-            //{
-            //    Console.ForegroundColor = points.Contains(interpolatedPoint) ? ConsoleColor.Green : ConsoleColor.Gray;
-            //    Console.WriteLine(interpolatedPoint);
-            //}
+            foreach (Vector2D interpolatedPoint in interpolatedPoints)
+            {
+                Console.ForegroundColor = points.Contains(interpolatedPoint) ? ConsoleColor.Green : ConsoleColor.Gray;
+                Console.WriteLine(interpolatedPoint);
+            }
         }
     }
 }
