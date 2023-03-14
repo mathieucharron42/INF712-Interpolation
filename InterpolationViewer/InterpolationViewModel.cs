@@ -5,6 +5,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 
 namespace InterpolationViewer
@@ -45,11 +46,29 @@ namespace InterpolationViewer
             set
             {
                 _pointsSetType = value;
+                if(_pointsSetType != PointsSet.Type.Custom)
+                {
+                    Points = PointsSet.GetSet(_pointsSetType);
+                }
                 NotifyPropertyChanged("PointsSetType");
                 NotifyPropertyChanged("Plot");
             }
         }
-        
+
+        public List<Vector2D> Points
+        {
+            get
+            {
+                return _points;
+            }
+            set
+            {
+                _points = value;
+                NotifyPropertyChanged("Points");
+                NotifyPropertyChanged("Plot");
+            }
+        }
+
         public Interpolations.InterpolationMode InterpolationMode
         {
             get
@@ -81,6 +100,7 @@ namespace InterpolationViewer
                 NotifyPropertyChanged("Plot");
             }
         }
+
         public float InterpolationRate
         {
             get
@@ -108,11 +128,20 @@ namespace InterpolationViewer
                 NotifyPropertyChanged("Plot");
             }
         }
+
+        public ScatterSeries ControlSeries
+        {
+            get
+            {
+                return _controlSeries;
+            }
+        }
+
         public PlotModel Plot
         {
             get
             {
-                List<Vector2D> points = PointsSet.GetSet(PointsSetType);
+                List<Vector2D> points = Points;
 
                 double inputMin = points.First().X;
                 double inputMax = points.Last().X;
@@ -138,15 +167,15 @@ namespace InterpolationViewer
                 interpolatedSeries.Title = "Valeurs interpolée";
                 interpolatedSeries.MarkerFill = OxyColor.FromRgb(0, 255, 0);
 
-                ScatterSeries controlSeries = new ScatterSeries();
-                controlSeries.MarkerType = MarkerType.Circle;
-                controlSeries.MarkerSize = 5;
+                _controlSeries = new ScatterSeries();
+                _controlSeries.MarkerType = MarkerType.Circle;
+                _controlSeries.MarkerSize = 5;
                 foreach (Vector2D point in points)
                 {
-                    controlSeries.Points.Add(new ScatterPoint(point.X, point.Y));
+                    _controlSeries.Points.Add(new ScatterPoint(point.X, point.Y));
                 }
-                controlSeries.Title = "Point de contrôle de passage";
-                controlSeries.MarkerFill = OxyColor.FromRgb(255, 0, 0);
+                _controlSeries.Title = "Point de contrôle de passage";
+                _controlSeries.MarkerFill = OxyColor.FromRgb(255, 0, 0);
 
                 ScatterSeries additionalControlSeries = new ScatterSeries();
                 additionalControlSeries.MarkerType = MarkerType.Triangle;
@@ -161,7 +190,7 @@ namespace InterpolationViewer
                 additionalControlSeries.MarkerFill = OxyColor.FromRgb(0, 0, 255);
 
                 model.Series.Add(interpolatedSeries);
-                model.Series.Add(controlSeries);
+                model.Series.Add(_controlSeries);
                 model.Series.Add(additionalControlSeries);
                 model.IsLegendVisible = false;
 
@@ -196,7 +225,19 @@ namespace InterpolationViewer
                 return model;
             }
         }
-        
+
+        public PlotController Controller
+        {
+            get
+            {
+                PlotController controller = new PlotController();
+                controller.BindMouseDown(OxyMouseButton.Left, new DelegatePlotCommand<OxyMouseDownEventArgs>(
+                    (view, _, args) => { controller.AddMouseManipulator(view, new DragAndDropManipulator(this, view), args); }
+                ));
+                return controller;
+            }
+        }
+
         public List<Interpolations.InterpolationMode> InterpolationModes
         {
             get
@@ -238,9 +279,12 @@ namespace InterpolationViewer
         };
 
         private PointsSet.Type _pointsSetType;
+        private List<Vector2D> _points = new List<Vector2D>();
         private Interpolations.InterpolationMode _interpolationMode;
         private Interpolations.ControlPointContrainst _controlPointConstraint;
         private float _interpolationRate;
         private PlotScaleType _plotScale;
+
+        private ScatterSeries _controlSeries;
     }
 }

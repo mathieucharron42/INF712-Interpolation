@@ -12,6 +12,7 @@ namespace Interpolation
             Convex,
             Intense,
             CornerCase,
+            Custom,
         }
 
         public static List<Vector2D> GetSet(Type type)

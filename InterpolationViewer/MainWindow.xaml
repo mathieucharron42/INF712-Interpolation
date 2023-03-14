@@ -43,7 +43,8 @@
         <TextBlock Grid.Column="0" Grid.Row="4" Text="Zoom" VerticalAlignment="Center"  Margin="5,5,10,5"/>
         <ComboBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding Path=PlotScaleTypes}" SelectedValue="{Binding Path=PlotScale}" Margin="7" />
 
-        <oxy:PlotView Grid.Column="1" Grid.Row="5" Model="{Binding Plot}" Width="700" Height="350" Margin="7" />
+        <!--<oxy:PlotView Grid.Column="1" Grid.Row="5" Model="{Binding Plot}" Width="700" Height="350" Margin="7"  />-->
 
+        <oxy:PlotView Grid.Column="1" Grid.Row="5" Model="{Binding Plot}" Width="700" Height="350" Margin="7" Controller="{Binding Controller}" />
     </Grid>
 </Window>
