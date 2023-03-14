@@ -2,6 +2,7 @@
 using OxyPlot;
 using OxyPlot.Series;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -21,9 +22,7 @@ namespace InterpolationViewer
         public override void Completed(OxyMouseEventArgs e)
         {
             base.Completed(e);
-            e.Handled = true;
-            PlotView.InvalidatePlot(true);
-
+            
             if (_currentPoint == null)
             {
                 return;
@@ -37,11 +36,24 @@ namespace InterpolationViewer
                 return;
             }
 
-            _model.PointsSetType = PointsSet.Type.Custom;
-            _model.Points = currentSeries.Points.ConvertAll(p => new Vector2D(p.X, p.Y));
+            if (_model.ControlSeries == currentSeries)
+            {
+                _model.PointsSetType = PointsSet.Type.Custom;
+                _model.Points = currentSeries.Points.ConvertAll(p => new Vector2D(p.X, p.Y));
+            }
+            else if(_model.AdditionalControlSeries == currentSeries)
+            {
+                _model.ControlPointConstraint = Interpolations.ControlPointContrainst.Custom;
+                _model.AdditionalControlPoints = currentSeries.Points.ConvertAll(p => new Vector2D(p.X, p.Y));
+            }
+            else
+            {
+                throw new Exception("Unhandled series");
+            }
             _currentPoint = null;
-
             PlotView.HideTracker();
+
+            PlotView.InvalidatePlot(true);
 
             _model.NotifyPropertyChanged("Plot");
         }
@@ -79,17 +91,21 @@ namespace InterpolationViewer
         {
             base.Started(e);
 
-            if (_model.ControlSeries != null)
+            List<ScatterSeries> seriesOfInterest = new List<ScatterSeries> { _model.ControlSeries, _model.AdditionalControlSeries };
+
+            foreach (ScatterSeries series in seriesOfInterest)
             {
-                HitTestResult hit = _model.ControlSeries.HitTest(new HitTestArguments(e.Position, 10));
-                if (hit != null)
+                if (series != null)
                 {
-                    ScatterSeries series = hit.Element as ScatterSeries;
-                    TrackerHitResult point = series.GetNearestPoint(e.Position, false);
-                    if (point != null)
+                    HitTestResult hit = series.HitTest(new HitTestArguments(e.Position, 10));
+                    if (hit != null)
                     {
-                        _currentPoint = point;
-                        Debug.WriteLine(string.Format("Pick {0}", _currentPoint.ToString()));
+                        TrackerHitResult point = series.GetNearestPoint(e.Position, false);
+                        if (point != null)
+                        {
+                            _currentPoint = point;
+                            Debug.WriteLine(string.Format("Pick {0}", _currentPoint.ToString()));
+                        }
                     }
                 }
             }

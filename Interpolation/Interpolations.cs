@@ -19,7 +19,7 @@ namespace Interpolation
 
         public enum ControlPointContrainst
         {
-            C0, C1, C2_Buggé
+            C0, C1, C2_Buggé, Custom
         }
 
         public static List<Vector2D> Chain(InterpolationFunc interpolationFunc, List<Vector2D> points, List<Vector2D> controlPoints, double min, double max, double interpolationRate)
@@ -39,6 +39,9 @@ namespace Interpolation
         public static List<ControlPointContrainst> GetPossibleConstrainsts(InterpolationMode mode)
         {
             List<ControlPointContrainst> Contraints = new List<ControlPointContrainst>();
+
+            Contraints.Add(ControlPointContrainst.Custom);
+
             if (mode == InterpolationMode.Linear)
             {
                 Contraints.Add(ControlPointContrainst.C0);
