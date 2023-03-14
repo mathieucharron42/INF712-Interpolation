@@ -18,7 +18,8 @@ namespace InterpolationViewer
         {
             OriginalPoints,
             InterpolatedPoints,
-            All
+            All,
+            Fixed
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -296,7 +297,9 @@ namespace InterpolationViewer
         {
             get
             {
-                return Enum.GetValues(typeof(PointsSet.Type)).Cast<PointsSet.Type>().ToList();
+                List<PointsSet.Type> list = Enum.GetValues(typeof(PointsSet.Type)).Cast<PointsSet.Type>().ToList();
+                list.Remove(PointsSet.Type.Custom);
+                return list;
             }
         }
 
@@ -304,7 +307,9 @@ namespace InterpolationViewer
         {
             get
             {
-                return Interpolations.GetPossibleConstrainsts(InterpolationMode);
+                List<Interpolations.ControlPointContrainst> list = Interpolations.GetPossibleConstrainsts(InterpolationMode);
+                list.Remove(Interpolations.ControlPointContrainst.Custom); 
+                return list;
             }
         }
 
@@ -315,6 +320,7 @@ namespace InterpolationViewer
                 return Enum.GetValues(typeof(PlotScaleType)).Cast<PlotScaleType>().ToList();
             }
         }
+
         private static Dictionary<Interpolations.InterpolationMode, InterpolationFunc> kInterpolationModeMapping = new Dictionary<Interpolations.InterpolationMode, InterpolationFunc>()
         {
             { Interpolations.InterpolationMode.Linear, Interpolations.Linear },

@@ -40,8 +40,6 @@ namespace Interpolation
         {
             List<ControlPointContrainst> Contraints = new List<ControlPointContrainst>();
 
-            Contraints.Add(ControlPointContrainst.Custom);
-
             if (mode == InterpolationMode.Linear)
             {
                 Contraints.Add(ControlPointContrainst.C0);
