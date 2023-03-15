@@ -51,6 +51,7 @@ namespace InterpolationViewer
                 {
                     Points = null;
                     ControlPointConstraint = null;
+                    PlotScale = PlotScaleType.OriginalPoints;
                 }
                 NotifyPropertyChanged("PointsSetType");
                 NotifyPropertyChanged("Plot");
@@ -168,6 +169,11 @@ namespace InterpolationViewer
             set
             {
                 _plotScale = value;
+                if(_plotScale == PlotScaleType.Fixed)
+                {
+                    _scaleTopLeftPoint = new Vector2D(_model.DefaultXAxis.Minimum + _axisMargin, _model.DefaultYAxis.Maximum - _axisMargin);
+                    _scaleBottomRight = new Vector2D(_model.DefaultXAxis.Maximum - _axisMargin, _model.DefaultYAxis.Minimum + _axisMargin);
+                }
                 NotifyPropertyChanged("PlotScale");
                 NotifyPropertyChanged("Plot");
             }
@@ -204,7 +210,7 @@ namespace InterpolationViewer
 
                 List<Vector2D> interpolatedPoints = Interpolations.Chain(interpolationFunction, points, controlPoints, inputMin, inputMax, InterpolationRate);
 
-                PlotModel model = new PlotModel { Title = string.Format("Interpolation {0} {1}", InterpolationMode, ControlPointConstraint) };
+                _model = new PlotModel { Title = string.Format("Interpolation {0} {1}", InterpolationMode, ControlPointConstraint) };
                 ScatterSeries interpolatedSeries = new ScatterSeries();
                 interpolatedSeries.MarkerType = MarkerType.Circle;
                 interpolatedSeries.MarkerSize = 5;
@@ -237,10 +243,10 @@ namespace InterpolationViewer
                 _additionalControlSeries.Title = "Point de contrôle additionel";
                 _additionalControlSeries.MarkerFill = OxyColor.FromRgb(0, 0, 255);
 
-                model.Series.Add(interpolatedSeries);
-                model.Series.Add(_controlSeries);
-                model.Series.Add(_additionalControlSeries);
-                model.IsLegendVisible = false;
+                _model.Series.Add(interpolatedSeries);
+                _model.Series.Add(_controlSeries);
+                _model.Series.Add(_additionalControlSeries);
+                _model.IsLegendVisible = false;
 
                 
                 double minimumX = 0;
@@ -263,14 +269,22 @@ namespace InterpolationViewer
                     minimumY = interpolatedPoints.Min(p => p.Y);
                     maximumY = interpolatedPoints.Max(p => p.Y);
                 }
+                else if(PlotScale == PlotScaleType.Fixed)
+                {
+                    minimumX = _scaleTopLeftPoint.Value.X;
+                    maximumX = _scaleBottomRight.Value.X;
+
+                    minimumY = _scaleBottomRight.Value.Y;
+                    maximumY = _scaleTopLeftPoint.Value.Y;
+                }
 
                 if (PlotScale != PlotScaleType.All)
                 {
-                    model.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Minimum = minimumX - 2, Maximum = maximumX + 2 });
-                    model.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Minimum = minimumY - 2, Maximum = maximumY + 2 });
+                    _model.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Minimum = minimumX - _axisMargin, Maximum = maximumX + _axisMargin });
+                    _model.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Minimum = minimumY - _axisMargin, Maximum = maximumY + _axisMargin });
                 }
 
-                return model;
+                return _model;
             }
         }
 
@@ -344,7 +358,11 @@ namespace InterpolationViewer
         private List<Vector2D> _additionalControlPoints;
         private float _interpolationRate;
         private PlotScaleType _plotScale;
+        private Vector2D? _scaleTopLeftPoint;
+        private Vector2D? _scaleBottomRight;
 
+        private PlotModel _model;
+        private int _axisMargin = 2;
         private ScatterSeries _controlSeries;
         private ScatterSeries _additionalControlSeries;
     }
