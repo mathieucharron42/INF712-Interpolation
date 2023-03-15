@@ -296,6 +296,10 @@ namespace InterpolationViewer
                 controller.BindMouseDown(OxyMouseButton.Left, new DelegatePlotCommand<OxyMouseDownEventArgs>(
                     (view, _, args) => { controller.AddMouseManipulator(view, new DragAndDropManipulator(this, view), args); }
                 ));
+
+                controller.BindMouseDown(OxyMouseButton.Left, OxyModifierKeys.None, 2, new DelegatePlotCommand<OxyMouseDownEventArgs>(
+                    (view, _, args) => { controller.AddMouseManipulator(view, new DoubleClickManipulator(this, view), args); }
+                ));
                 return controller;
             }
         }
