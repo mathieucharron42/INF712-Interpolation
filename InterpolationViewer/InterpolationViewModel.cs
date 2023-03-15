@@ -50,7 +50,7 @@ namespace InterpolationViewer
                 if (_pointsSetType != PointsSet.Type.Custom)
                 {
                     Points = null;
-                    ControlPointConstraint = BestControlPointConstraints;
+                    ControlPointConstraint = null;
                 }
                 NotifyPropertyChanged("PointsSetType");
                 NotifyPropertyChanged("Plot");
@@ -73,6 +73,10 @@ namespace InterpolationViewer
             set
             {
                 _points = value;
+                if(_points != null)
+                {
+                    _points.Sort((v1, v2) => v1.X.CompareTo(v2.X));
+                }
                 NotifyPropertyChanged("Points");
                 NotifyPropertyChanged("Plot");
             }
@@ -87,7 +91,7 @@ namespace InterpolationViewer
             set
             {
                 _interpolationMode = value;
-                ControlPointConstraint = BestControlPointConstraints;
+                ControlPointConstraint = null;
                 NotifyPropertyChanged("InterpolationMode");
                 NotifyPropertyChanged("ControlPointConstraint");
                 NotifyPropertyChanged("ControlPointConstraints");
@@ -95,11 +99,18 @@ namespace InterpolationViewer
             }
         }
         
-        public Interpolations.ControlPointContrainst ControlPointConstraint
+        public Interpolations.ControlPointContrainst? ControlPointConstraint
         {
             get
             {
-                return _controlPointConstraint;
+                if (_controlPointConstraint.HasValue)
+                {
+                    return _controlPointConstraint;
+                }
+                else
+                {
+                    return BestControlPointConstraints;
+                }
             }
             set
             {
@@ -123,7 +134,7 @@ namespace InterpolationViewer
                 }
                 else
                 {
-                    return Interpolations.GetControlPoints(Points, InterpolationMode, ControlPointConstraint);
+                    return Interpolations.GetControlPoints(Points, InterpolationMode, ControlPointConstraint.Value);
                 }
             }
             set
@@ -329,7 +340,7 @@ namespace InterpolationViewer
         private PointsSet.Type _pointsSetType;
         private List<Vector2D> _points;
         private Interpolations.InterpolationMode _interpolationMode;
-        private Interpolations.ControlPointContrainst _controlPointConstraint;
+        private Interpolations.ControlPointContrainst? _controlPointConstraint;
         private List<Vector2D> _additionalControlPoints;
         private float _interpolationRate;
         private PlotScaleType _plotScale;
